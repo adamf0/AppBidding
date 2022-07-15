@@ -11,16 +11,20 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
 class CreateUserController extends Controller
 {
     private CreateUserInputPort $interactor;
-    public function __construct(CreateUserInputPort $interactor)
+    public function __construct(CreateUserInputPort $interactor) //injeksi AppServiceProvider line 28 "->needs(UseCases\CreateUser\CreateUserInputPort::class)"
     {
         $this->interactor = $interactor;
     }
 
     public function __invoke(CreateUserRequest $request): ?HttpResponse
     {
-        $viewModel = $this->interactor->createUser(
-            new CreateUserRequest($request->validate())
-        )
+        $viewModel = $this->interactor->createUser( //
+            new CreateUserRequestModel($request->validate())
+        );
+
+        if ($viewModel instanceof HttpResponseViewModel) {
+            return $viewModel->getResponse();
+        }
 
         return null;
     }
